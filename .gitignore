@@ -1,0 +1,42 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Odoo specific
+*.log
+logs/
+*.pot
+*.pyc
+
+# Backups and output
+backups/*.sql.gz
+backups/*.sql
+output/*.txt
+output/*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker volumes (if mounted locally)
+# volumes/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
