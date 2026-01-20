@@ -86,7 +86,7 @@ echo "⚠️  УВАГА: Цей скрипт видалить всі дані �
 echo "   База даних: ${DB_NAME}"
 echo ""
 echo "Буде видалено:"
-echo "  - Контакти (res.partner)"
+echo "  - Контакти (res.partner, крім користувачів та компаній)"
 echo "  - Товари (product.product, product.template)"
 echo "  - Продажі (sale.order, sale.order.line)"
 echo "  - Закупівлі (purchase.order, purchase.order.line)"
@@ -95,6 +95,8 @@ echo "  - Рахунки (account.move, account.payment)"
 echo "  - Інші бізнес-дані"
 echo ""
 echo "ЗАЛИШИТЬСЯ:"
+echo "  - Користувачі (res.users) - ВАЖЛИВО!"
+echo "  - Компанії (res.company)"
 echo "  - Структура таблиць"
 echo "  - Модулі та їх налаштування"
 echo "  - Системні записи (ir.*)"
@@ -144,9 +146,23 @@ TRUNCATE TABLE product_product CASCADE;
 TRUNCATE TABLE product_template CASCADE;
 TRUNCATE TABLE product_category CASCADE;
 
-TRUNCATE TABLE res_partner CASCADE;
+-- ВАЖЛИВО: НЕ видаляємо res_partner повністю через TRUNCATE, бо це видалить користувачів!
+-- Видаляємо тільки партнерів, які НЕ є користувачами та НЕ є компаніями
+DELETE FROM res_partner 
+WHERE id NOT IN (
+    SELECT partner_id FROM res_users WHERE partner_id IS NOT NULL
+    UNION
+    SELECT id FROM res_company
+);
 
-TRUNCATE TABLE mail_message CASCADE;
+-- НЕ видаляємо mail_message повністю, бо там можуть бути системні повідомлення
+-- Видаляємо тільки повідомлення, пов'язані з видаленими записами
+DELETE FROM mail_message 
+WHERE model NOT IN (
+    'ir.module.module', 'ir.model', 'ir.model.fields', 
+    'ir.ui.view', 'ir.actions.act_window', 'ir.actions.server',
+    'res.users', 'res.company', 'res.groups'
+);
 TRUNCATE TABLE mail_followers CASCADE;
 TRUNCATE TABLE mail_activity CASCADE;
 
@@ -174,8 +190,7 @@ END \$\$;
 -- Увімкнути перевірки зовнішніх ключів
 SET session_replication_role = 'origin';
 
--- Очистити послідовності (для нових ID)
-ALTER SEQUENCE IF EXISTS res_partner_id_seq RESTART WITH 1;
+-- НЕ скидаємо послідовність res_partner, бо користувачі залишилися
 ALTER SEQUENCE IF EXISTS product_product_id_seq RESTART WITH 1;
 ALTER SEQUENCE IF EXISTS product_template_id_seq RESTART WITH 1;
 ALTER SEQUENCE IF EXISTS sale_order_id_seq RESTART WITH 1;
