@@ -141,7 +141,7 @@ ODOO_CMD="${ODOO_CMD} -i ${MODULES_TO_INSTALL}"
 
 # Додаємо stop-after-init, якщо потрібно
 if [ -n "$STOP_AFTER_INIT" ]; then
-    ODOO_CMD="${ODOO_CMD} ${STOP_AFTER_INIT}"
+    ODOO_CMD="${ODOO_CMD} ${STOP_AFTER_INIT} --http-port=8099"
 fi
 
 echo "🚀 Встановлення модулів Odoo..."
