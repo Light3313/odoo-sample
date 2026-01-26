@@ -12,6 +12,11 @@ services:
       - ./addons:/mnt/extra-addons
       - ${ENTERPRISE_PATH:-../check-files/enterprise}:/mnt/enterprise
       - ./logs:/var/log/odoo
+    command: >
+      sh -c "
+        chown -R odoo:odoo /var/log/odoo 2>/dev/null || true &&
+        exec /entrypoint.sh odoo
+      "
     environment:
       - HOST=${DB_HOST:-db}
       - USER=${DB_USER:-odoo}
