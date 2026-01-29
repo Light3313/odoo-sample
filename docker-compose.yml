@@ -6,15 +6,17 @@ services:
         condition: service_healthy
     ports:
       - "${ODOO_PORT:-8069}:8069"
+    user: "0"
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./config:/etc/odoo
       - ./addons:/mnt/extra-addons
       - ${ENTERPRISE_PATH:-../check-files/enterprise}:/mnt/enterprise
       - ./logs:/var/log/odoo
+      - ./export_rules:/var/lib/odoo/1c_exchange/rules
     command: >
       sh -c "
-        chown -R odoo:odoo /var/log/odoo 2>/dev/null || true &&
+        chown -R odoo:odoo /var/lib/odoo /var/log/odoo &&
         exec /entrypoint.sh odoo
       "
     environment:
